@@ -1,0 +1,36 @@
+#include "osa_com_def.h"
+#include "osa_com_mq_if.h"
+#include "{{ task_name }}_stm.h"
+#include "{{ task_name }}_msg_api.h"
+
+void {{ task_name }}_taskinit(void)
+{
+    
+}
+
+void * {{ task_name }}_taskmain(void * arg)
+{
+    while (1)
+    {
+        uint8_t buff[MQ_BUF_SIZE_MAX] = {0};
+        int32_t recv_bytes = osa_com_mq_recv(TASK_ID_{{ task_name | upper }}, buff, MQ_BUF_SIZE_MAX);
+        if (recv_bytes >= 0)
+        {
+            MSG_INFO_T * pst_msg = (MSG_INFO_T *)malloc(recv_bytes);
+            if (NULL != pst_msg)
+            {
+                memset(pst_msg, 0, recv_bytes);
+                memcpy(pst_msg, buff, recv_bytes);
+                {{ task_name | upper }}_STM_STS_E state = {{ task_name }}_stm_state_get();
+                {{ task_name | upper }}_EVENT_ID_E event_id = pst_msg->event_id;
+                if (({{ task_name | upper }}_STM_STS_MAX > state) && ({{ task_name | upper }}_EVENT_TYPE_MAX > event_id))
+                {
+                    g_{{ task_name }}_stm_matrix[state][event_id](pst_msg);
+                }
+
+                free(pst_msg);
+                pst_msg = NULL;
+            }
+        }
+    }
+}
