@@ -1,0 +1,41 @@
+#include "{{ task_name }}_msg_api.h"
+
+void {{ task_name | upper }}_API_{{ event_name }}(void)
+{
+    MSG_INFO_T t_msg;
+
+    memset(&t_msg, 0, sizeof(t_msg));
+
+    t_msg.tsk_id = TASK_ID_{{ task_name | upper }};
+    t_msg.event_id = {{ task_name | upper }}_EVENT_TYPE_{{ event_name }};
+
+    osa_com_mq_send(TASK_ID_{{ task_name | upper }}, (const char *)&t_msg, sizeof(t_msg));
+}
+
+void {{ task_name | upper }}_API_{{ event_name }}({{ args_type }} {{ args_var }})
+{
+    MSG_INFO_T t_msg;
+
+    memset(&t_msg, 0, sizeof(t_msg));
+
+    t_msg.tsk_id = TASK_ID_{{ task_name | upper }};
+    t_msg.event_id = {{ task_name | upper }}_EVENT_TYPE_{{ event_name }};
+    t_msg.size = sizeof({{ args_var }});
+    memcpy(t_msg.content, &{{ args_var }}, sizeof({{ args_var }}));
+
+    osa_com_mq_send(TASK_ID_{{ task_name | upper }}, (const char *)&t_msg, sizeof(t_msg)); 
+}
+
+void {{ task_name | upper }}_API_{{ event_name }}(const {{ pointer_type }} * {{ pointer_var }}, {{ args_type }} {{ args_var }})
+{
+    MSG_INFO_T t_msg;
+
+    memset(&t_msg, 0, sizeof(t_msg));
+
+    t_msg.tsk_id = TASK_ID_{{ task_name | upper }};
+    t_msg.event_id = {{ task_name | upper }}_EVENT_TYPE_{{ event_name }};
+    t_msg.size = {{ args_var }};
+    memcpy(t_msg.content, {{ pointer_var }}, {{ args_var }});
+
+    osa_com_mq_send(TASK_ID_{{ task_name | upper }}, (const char *)&t_msg, sizeof(t_msg)); 
+}
