@@ -1,0 +1,23 @@
+#include "{{ task_name }}_stm.h"
+
+static {{ task_name | upper }}_STM_STS g_{{ task_name }}_stm_sts = {{ task_name | upper }}_STM_STS_{{ states[0] | upper }};
+
+{% if states | length > 1 %}void {{ task_name }}_stm_state_set({{ task_name | upper }}_STM_STS new_state)
+{
+    g_{{ task_name }}_stm_sts = new_state;
+} {% endif %}
+
+{{ task_name | upper }}_STM_STS {{ task_name }}_stm_state_get(void)
+{
+    return g_{{ task_name }}_stm_sts;
+}
+
+{% for state in states %} 
+{% for event in events %}
+void {{ task_name }}_stm_{{ state }}_{{ event }}(const MSG_INFO_T * pst_msg)
+{
+    assert(NULL != pst_msg);
+
+    return;
+} {% endfor %} 
+{% endfor %}

@@ -1,0 +1,23 @@
+#ifndef _{{ task_name | upper }}_STM_H_
+#define _{{ task_name | upper }}_STM_H_
+
+#include "{{ task_name }}_msg_api.h"
+
+typedef enum
+{ {% for state in states %}
+    {{ task_name | upper }}_STM_STS_{{ state }}, {% endfor %}
+    {{ task_name | upper }}_STM_STS_MAX,
+} {{ task_name | upper }}_STM_STS;
+
+{% for state in states %} {% for event in events %}
+void {{ task_name }}_stm_{{ state }}_{{ event }}(const MSG_INFO_T * pst_msg);
+{% endfor %} {% endfor %}
+
+const static STM_HANDLE g_{{ task_name }}_stm_matrix[{{ task_name | upper }}_STM_STS_MAX][{{ task_name | upper }}_EVENT_TYPE_MAX] = 
+{ {% for state in states %} 
+    { {% for event in events %}
+        {{ task_name }}_stm_{{ state }}_{{ event }}, {% endfor %} 
+    }, {% endfor %} 
+};
+
+#endif

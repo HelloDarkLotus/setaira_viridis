@@ -38,6 +38,13 @@ class LoadConf:
             component_info_dict['%s' % component_name] = component_info
             component_info['task_name'] = cf.get('basic_info', 'task_name')
 
+            state_list = list()
+            key_list = cf.options('state')
+            for key in key_list:
+                state_list.append(cf.get('state', '%s' % key))
+
+            component_info['state'] = state_list
+
             event_name_list = list()
             key_list = cf.options('event_name')
             for key in key_list:
@@ -74,6 +81,24 @@ class LoadConf:
             h_file = template.render(task_name=component_info['task_name'], events=component_info['event_name'])
             f.write(h_file)
 
+    def generate_stm_c(self, component_info):
+        env = Environment(loader=FileSystemLoader(self.template_dir))
+        template = env.get_template('templates_stm_c.j2')
+
+        target_file_name = component_info['task_name'] + '_stm.c'
+        with open(self.target_dir + target_file_name, 'w') as f:
+            c_file = template.render(task_name=component_info['task_name'], events=component_info['event_name'], states=component_info['state'])
+            f.write(c_file)
+
+    def generate_stm_h(self, component_info):
+        env = Environment(loader=FileSystemLoader(self.template_dir))
+        template = env.get_template('templates_stm_h.j2')
+
+        target_file_name = component_info['task_name'] + '_stm.h'
+        with open(self.target_dir + target_file_name, 'w') as f:
+            h_file = template.render(task_name=component_info['task_name'], events=component_info['event_name'], states=component_info['state'])
+            f.write(h_file)
+
 if __name__ == '__main__':
     instance = LoadConf()
     component_list_in_conf = instance.load_component()
@@ -86,3 +111,5 @@ if __name__ == '__main__':
         instance.generate_taskmain_c(component_info_dict[component_name])
         instance.generate_msg_api_c(component_info_dict[component_name])
         instance.generate_msg_api_h(component_info_dict[component_name])
+        instance.generate_stm_c(component_info_dict[component_name])
+        instance.generate_stm_h(component_info_dict[component_name])
