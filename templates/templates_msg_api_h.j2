@@ -2,11 +2,13 @@
 #define _{{ task_name | upper }}_MSG_API_H_
 
 typedef enum
-{
-{% for event_name in events %}
-    {{ task_name | upper }}_EVENT_TYPE_{{ event_name | upper }},
-{% endfor %}    
+{ {% for event_name in events %}
+    {{ task_name | upper }}_EVENT_TYPE_{{ event_name | upper }}, {% endfor %}    
     {{ task_name | upper }}_EVENT_TYPE_MAX,
 }{{ task_name | upper }}_EVENT_ID_E;
+
+{% for event_name in events %}
+void {{ task_name | upper }}_API_{{ event_name | upper }}(void);
+{% endfor %}
 
 #endif

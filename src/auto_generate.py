@@ -28,6 +28,13 @@ class LoadConf:
 
         return valid_component_list
 
+    def generate_store_dir(self, valid_component_list):
+        for component in valid_component_list:
+            if os.path.exists(self.target_dir + component):
+                os.rmdir(self.target_dir + component)
+
+            os.mkdir(self.target_dir + component)
+
     def parse_component_conf(self, valid_component_list):
         cf = configparser.ConfigParser()
         
@@ -59,7 +66,8 @@ class LoadConf:
         template = env.get_template('templates_taskmain_c.j2')
 
         target_file_name = component_info['task_name'] + '_taskmain.c'
-        with open(self.target_dir + target_file_name, 'w') as f:
+        target_file_path = self.target_dir + component_info['task_name'] + r'\\' + target_file_name
+        with open(target_file_path, 'w') as f:
             c_file = template.render(task_name=component_info['task_name'])
             f.write(c_file)
 
@@ -68,7 +76,8 @@ class LoadConf:
         template = env.get_template('templates_msg_api_c.j2')
 
         target_file_name = component_info['task_name'] + '_msg_api.c'
-        with open(self.target_dir + target_file_name, 'w') as f:
+        target_file_path = self.target_dir + component_info['task_name'] + r'\\' + target_file_name
+        with open(target_file_path, 'w') as f:
             c_file = template.render(task_name=component_info['task_name'], events=component_info['event_name'])
             f.write(c_file)
 
@@ -77,7 +86,8 @@ class LoadConf:
         template = env.get_template('templates_msg_api_h.j2')
 
         target_file_name = component_info['task_name'] + '_msg_api.h'
-        with open(self.target_dir + target_file_name, 'w') as f:
+        target_file_path = self.target_dir + component_info['task_name'] + r'\\' + target_file_name
+        with open(target_file_path, 'w') as f:
             h_file = template.render(task_name=component_info['task_name'], events=component_info['event_name'])
             f.write(h_file)
 
@@ -86,7 +96,8 @@ class LoadConf:
         template = env.get_template('templates_stm_c.j2')
 
         target_file_name = component_info['task_name'] + '_stm.c'
-        with open(self.target_dir + target_file_name, 'w') as f:
+        target_file_path = self.target_dir + component_info['task_name'] + r'\\' + target_file_name
+        with open(target_file_path, 'w') as f:
             c_file = template.render(task_name=component_info['task_name'], events=component_info['event_name'], states=component_info['state'])
             f.write(c_file)
 
@@ -95,14 +106,26 @@ class LoadConf:
         template = env.get_template('templates_stm_h.j2')
 
         target_file_name = component_info['task_name'] + '_stm.h'
-        with open(self.target_dir + target_file_name, 'w') as f:
+        target_file_path = self.target_dir + component_info['task_name'] + r'\\' + target_file_name
+        with open(target_file_path, 'w') as f:
             h_file = template.render(task_name=component_info['task_name'], events=component_info['event_name'], states=component_info['state'])
+            f.write(h_file)
+
+    def generate_api_h(self, component_info):
+        env = Environment(loader=FileSystemLoader(self.template_dir))
+        template = env.get_template('templates_api_h.j2')
+
+        target_file_name = component_info['task_name'] + '_api.h'
+        target_file_path = self.target_dir + component_info['task_name'] + r'\\' + target_file_name
+        with open(target_file_path, 'w') as f:
+            h_file = template.render(task_name=component_info['task_name'])
             f.write(h_file)
 
 if __name__ == '__main__':
     instance = LoadConf()
     component_list_in_conf = instance.load_component()
     valid_component_list = instance.check_component_validation(component_list_in_conf)
+    instance.generate_store_dir(valid_component_list)
     component_info_dict = instance.parse_component_conf(valid_component_list)
 
     component_name_list = list(component_info_dict.keys())
@@ -113,3 +136,4 @@ if __name__ == '__main__':
         instance.generate_msg_api_h(component_info_dict[component_name])
         instance.generate_stm_c(component_info_dict[component_name])
         instance.generate_stm_h(component_info_dict[component_name])
+        instance.generate_api_h(component_info_dict[component_name])

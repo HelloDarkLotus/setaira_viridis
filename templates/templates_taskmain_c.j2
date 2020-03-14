@@ -14,7 +14,7 @@ void * {{ task_name }}_taskmain(void * arg)
     {
         uint8_t buff[MQ_BUF_SIZE_MAX] = {0};
         int32_t recv_bytes = osa_com_mq_recv(TASK_ID_{{ task_name | upper }}, buff, MQ_BUF_SIZE_MAX);
-        if (recv_bytes >= 0)
+        if (recv_bytes > 0)
         {
             MSG_INFO_T * pst_msg = (MSG_INFO_T *)malloc(recv_bytes);
             if (NULL != pst_msg)
